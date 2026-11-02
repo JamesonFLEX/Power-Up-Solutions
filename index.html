@@ -127,8 +127,8 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 
 /* hero */
 .hero{position:relative;color:var(--white);background:var(--black);overflow:hidden}
-.hero .bg{position:absolute;inset:0;background:url(img/house.jpg) center 62%/cover no-repeat;transform:scale(1.04);animation:drift 22s ease-in-out infinite alternate}
-@keyframes drift{to{transform:scale(1.16) translateY(-2%)}}
+.hero .bg{position:absolute;inset:0;background:url(img/hero.jpg) center 40%/cover no-repeat;animation:none}
+
 .hero .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.88) 0%,rgba(0,0,0,.62) 38%,rgba(0,0,0,.12) 70%,rgba(0,0,0,0) 100%),linear-gradient(180deg,rgba(0,0,0,0) 60%,#000 100%)}
 .hero .inner{position:relative;padding-block:clamp(110px,22vw,220px) 56px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:end}
 .hero .inner > *{min-width:0}
@@ -146,9 +146,9 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;backgroun
 .gstar .st{color:#f5a623;letter-spacing:2px}
 @media (max-width:880px){.hero .inner{grid-template-columns:1fr}
   /* phones: show the whole photo as a banner, text starts below it */
-  .hero .bg{bottom:auto;height:calc(100vw * 768 / 1344);background-position:center;background-size:cover;transform:none;animation:none}
+  .hero .bg{bottom:auto;height:var(--bh,calc(100vw * 488 / 1118));background-position:center;background-size:cover;transform:none;animation:none}
   .hero .bg::after{background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 62%,rgba(0,0,0,.75) 88%,#000 100%)}
-  .hero .inner{padding-top:calc(100vw * 768 / 1344 + 8px)}
+  .hero .inner{padding-top:calc(var(--bh,calc(100vw * 488 / 1118)) + 8px)}
 }
 
 /* rate compare */
@@ -665,7 +665,7 @@ body.on-quote .mbar{display:none}
 
 <!-- ======================= ABOUT ======================= -->
 <article class="page" data-page="about" aria-labelledby="h-about" hidden>
-  <section class="hero"><div class="bg" aria-hidden="true" style="background-image:url(img/pool.jpg)"></div>
+  <section class="hero" style="--bh:calc(100vw * 316 / 494)"><div class="bg" aria-hidden="true" style="background-image:url(img/pool.jpg)"></div>
     <div class="wrap inner" style="grid-template-columns:1fr"><div><p class="eyebrow">About us</p><h1 id="h-about">California’s #1 Home Solar Provider</h1><div class="ctas"><a class="pill" href="#quote">Get a Quote</a></div></div></div>
   </section>
   <section class="light band">
@@ -691,7 +691,7 @@ body.on-quote .mbar{display:none}
 
 <!-- ======================= PLANS ======================= -->
 <article class="page" data-page="plans" aria-labelledby="h-plans" hidden>
-  <section class="hero"><div class="bg" aria-hidden="true" style="background-image:url(img/roof.jpg)"></div>
+  <section class="hero" style="--bh:calc(100vw * 384 / 609)"><div class="bg" aria-hidden="true" style="background-image:url(img/roof.jpg)"></div>
     <div class="wrap inner" style="grid-template-columns:1fr"><div><p class="eyebrow">Plans and pricing</p><h1 id="h-plans">Find the right plan for you</h1><div class="ctas"><a class="pill" href="#quote">Get a Quote</a></div></div></div>
   </section>
   <section class="light band">
@@ -734,7 +734,7 @@ body.on-quote .mbar{display:none}
 
 <!-- ======================= TESTIMONIALS ======================= -->
 <article class="page" data-page="testimonials" aria-labelledby="h-test" hidden>
-  <section class="hero"><div class="bg" aria-hidden="true" style="background-image:url(img/team.jpg)"></div>
+  <section class="hero" style="--bh:calc(100vw * 332 / 500)"><div class="bg" aria-hidden="true" style="background-image:url(img/team.jpg)"></div>
     <div class="wrap inner" style="grid-template-columns:1fr"><div><p class="eyebrow">Customer testimonials</p><h1 id="h-test">Real Customers, Real Stories</h1><div class="ctas"><a class="pill" href="#quote">Get a Quote</a><a class="pill" href="https://www.google.com/maps/search/?api=1&query=Power+Up+Solutions+3855+Atherton+Rd+Rocklin+CA" target="_blank" rel="noopener">4.8★ · 195 Google reviews</a></div></div></div>
   </section>
   <section class="dark band" style="padding-top:20px">
@@ -750,7 +750,7 @@ body.on-quote .mbar{display:none}
 
 <!-- ======================= CAREERS ======================= -->
 <article class="page" data-page="careers" aria-labelledby="h-careers" hidden>
-  <section class="hero"><div class="bg" aria-hidden="true" style="background-image:url(img/installer.jpg)"></div>
+  <section class="hero" style="--bh:calc(100vw * 316 / 494)"><div class="bg" aria-hidden="true" style="background-image:url(img/installer.jpg)"></div>
     <div class="wrap inner" style="grid-template-columns:1fr"><div><p class="eyebrow">Join our team</p><h1 id="h-careers">Help us build a brighter future</h1><div class="ctas"><a class="pill" href="#apply">Apply now</a></div></div></div>
   </section>
   <section class="gray band">
@@ -788,7 +788,7 @@ body.on-quote .mbar{display:none}
 
 <!-- ======================= DEALER ======================= -->
 <article class="page" data-page="dealer-program" aria-labelledby="h-dealer" hidden>
-  <section class="hero"><div class="bg" aria-hidden="true" style="background-image:url(img/team.jpg)"></div>
+  <section class="hero" style="--bh:calc(100vw * 332 / 500)"><div class="bg" aria-hidden="true" style="background-image:url(img/team.jpg)"></div>
     <div class="wrap inner" style="grid-template-columns:1fr"><div><p class="eyebrow">Let's build together</p><h1 id="h-dealer">Power Up Solutions Dealer Program</h1><div class="ctas"><a class="pill" href="#dealer-apply">Apply Now</a></div></div></div>
   </section>
   <section class="light band">
