@@ -447,32 +447,6 @@ body.on-quote .mbar{display:none}
     </div>
   </section>
 
-  <section class="dark band" style="padding-top:20px">
-    <div class="wrap">
-      <div class="center"><p class="eyebrow">Your rate, compared</p><h2 class="h2" style="margin-top:10px">Stop paying utility rates</h2></div>
-      <div class="rates">
-        <div class="rate pge"><div class="num">$0.45<small>/kWh</small></div><div class="lbl">PG&amp;E average</div></div>
-        <div class="vs" aria-hidden="true">VS</div>
-        <div class="rate sol"><div class="num">$0.25<small>/kWh</small></div><div class="lbl">Solar rate with Tesla battery</div></div>
-      </div>
-      <div class="calc">
-        <div>
-          <label for="billR">Your average monthly electric bill</label>
-          <div class="big" id="billV">$250</div>
-          <input id="billR" type="range" min="75" max="800" step="5" value="250" aria-describedby="rateFine">
-          <p class="fine" id="rateFine" style="margin-top:4px">Slide to your bill. We estimate your usage at the $0.45 average rate.</p>
-        </div>
-        <div class="out" aria-live="polite">
-          <div><span>Estimated monthly usage</span><b id="oKwh">556 kWh</b></div>
-          <div><span>Same usage at $0.25/kWh</span><b id="oSol">$139</b></div>
-          <div class="save"><span>Estimated difference / month</span><b id="oSave">$111</b></div>
-          <div><span>Estimated difference / year</span><b id="oYear">$1,333</b></div>
-        </div>
-      </div>
-      <p class="fine center">Rates shown are averages; actual pricing and savings vary. Your specialist confirms your real numbers.</p>
-      <div class="center" style="margin-top:22px"><a class="pill solid" href="#quote">Get my real numbers</a></div>
-    </div>
-  </section>
 
   <svg class="curve" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true" style="background:#000"><defs><linearGradient id="cg1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#1a1a1a"/><stop offset="1" stop-color="#0b0f1a"/></linearGradient></defs><path d="M0 100V40C360 110 720 0 1080 50 1260 75 1360 60 1440 40V100Z" fill="url(#cg1)"/></svg>
   <section class="band" id="how-it-works" style="background:#0b0f1a;color:#fff;padding-top:30px">
@@ -890,11 +864,6 @@ $('#gReviews').innerHTML=gHTML;$('#gReviews2').innerHTML=gHTML;
 $('#siteReviews').innerHTML=SREV.map(r=>`<div class="rv"><div class="st" aria-label="5 stars">★★★★★</div><q>${r[0]}</q><div class="who"><b>${r[1]}</b> · ${r[2]}</div></div>`).join('');
 $$('[data-scroll]').forEach(b=>b.onclick=()=>{const row=b.closest('.rv-wrap').querySelector('.rv-row');row.scrollBy({left:(+b.dataset.scroll)*row.clientWidth*.85,behavior:'smooth'})});
 
-/* ---------- rate calculator ---------- */
-const bR=$('#billR');
-function calc(){const b=+bR.value,k=b/.45,s=k*.25;$('#billV').textContent=money(b)+(b>=800?'+':'');$('#oKwh').textContent=Math.round(k).toLocaleString()+' kWh';$('#oSol').textContent=money(s);$('#oSave').textContent=money(b-s);$('#oYear').textContent=money((b-s)*12)}
-bR.addEventListener('input',()=>{calc();Q.data.bill=+bR.value});calc();
-
 /* ---------- journey ---------- */
 const J=[['Site Survey','We evaluate your home, roof, shading, and energy needs.','<path d="M3 11l9-7 9 7v9H3z"/><circle cx="15" cy="15" r="3"/><path d="M17.2 17.2L20 20"/>'],['Design','A custom solar system designed for performance and savings.','<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M7 12l5-4 5 4"/>'],['Permits','We handle permits and paperwork.','<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/>'],['Install','Certified team installs your system safely.','<path d="M3 20l4-11h10l4 11z"/><path d="M8.5 14h7M6 9V6a6 6 0 0 1 12 0v3"/>'],['Final Inspection','Local building department checks your system.','<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 12l2 2 4-4"/>'],['Interconnection','Your utility connects your system to the grid.','<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2M2 12h2M20 12h2"/>']];
 let ji=0;const jt=$('#jtrack');
@@ -1018,7 +987,7 @@ const Q=window.Q={data:{bill:250},i:0,started:false,
     let body='';
     if(st.type==='opt')body=`<div class="opts">${st.o.map(o=>`<button type="button" class="opt" aria-pressed="${d[st.id]===o[0]}" data-v="${esc(o[0])}">${IC[o[1]]}<span><b>${o[0]}</b><small>${o[2]}</small></span></button>`).join('')}</div>${st.id==='own'?'':''}`;
     if(st.type==='zip')body=`<label class="fld">Zip code *<input id="q-zip" class="zip" inputmode="numeric" maxlength="5" autocomplete="postal-code" value="${esc(d.zip||'')}"></label><p class="msg" id="zMsg" aria-live="polite"></p>`;
-    if(st.type==='bill')body=`<div style="font-size:clamp(2.4rem,8vw,3.4rem);font-weight:700;font-variant-numeric:tabular-nums" id="qBillV"></div><input type="range" id="q-bill" min="75" max="800" step="5" value="${d.bill}" aria-label="Monthly electric bill" style="accent-color:#000"><div class="sumry"><div><span>Same usage at $0.25/kWh</span><b id="qSol"></b></div><div><span>Estimated difference / year</span><b id="qYr" style="color:#15803d"></b></div></div><p class="fine" style="margin:0">Based on the $0.45/kWh PG&amp;E average vs. the $0.25/kWh solar rate with Tesla battery. Actual pricing and savings vary.</p>`;
+    if(st.type==='bill')body=`<div style="font-size:clamp(2.4rem,8vw,3.4rem);font-weight:700;font-variant-numeric:tabular-nums" id="qBillV"></div><input type="range" id="q-bill" min="75" max="800" step="5" value="${d.bill}" aria-label="Monthly electric bill" style="accent-color:#000">`;
     if(st.type==='contact')body=`<div class="two"><label class="fld">First Name *<input id="q-first" autocomplete="given-name" value="${esc(d.first||'')}"></label><label class="fld">Last Name *<input id="q-last" autocomplete="family-name" value="${esc(d.last||'')}"></label></div><label class="fld">Email *<input id="q-email" type="email" autocomplete="email" value="${esc(d.email||'')}"></label><label class="fld">Phone *<input id="q-phone" type="tel" autocomplete="tel" value="${esc(d.phone||'')}"></label><p class="msg bad" id="cMsg" aria-live="polite"></p>`;
     if(st.type==='consent')body=`<div class="sumry">${this.rows().map(r=>`<div><span>${r[0]}</span><b>${esc(r[1]||'—')}</b></div>`).join('')}</div><label class="consent"><input type="checkbox" id="q-ok"><span>I authorize Power Up Solutions to call me and send pre-recorded messages and text messages to me about Power Up products and services at the telephone number I entered above, using an autodialer. Message and data rates may apply. You can opt out anytime. You also agree to our <a href="https://storage.googleapis.com/msgsndr/dRphosf7atJSWJMPleys/media/67dbc3f7e4e6453aec8407bc.pdf" target="_blank" rel="noopener">Terms of Service</a>.</span></label><p class="msg bad" id="okMsg" aria-live="polite"></p>`;
     const showNext=st.type!=='opt';
@@ -1034,7 +1003,7 @@ const Q=window.Q={data:{bill:250},i:0,started:false,
     if(st.type==='zip'){const z=$('#q-zip'),m=$('#zMsg');const ck=()=>{z.value=z.value.replace(/\D/g,'').slice(0,5);if(z.value.length<5){m.textContent='';m.className='msg';return false}const p=+z.value.slice(0,3);if(p>=900&&p<=961){d.zip=z.value;m.textContent='✓ Great news, we install in your area. Nearest office: '+(p>=939?'Rocklin':'Murrieta')+'.';m.className='msg ok';return true}m.textContent='That ZIP is outside California, where we install.';m.className='msg bad';return false};
       z.oninput=()=>{if(ck()&&!reduce)setTimeout(()=>{if(ck()&&this.steps[this.i].id==='zip')this.next()},700)};ck();
       $('#qNext').onclick=()=>{if(ck())this.next();else{m.textContent=m.textContent||'Enter your 5-digit ZIP code.';m.className='msg bad';z.focus()}}}
-    if(st.type==='bill'){const r=$('#q-bill');const up=()=>{d.bill=+r.value;const s=d.bill/.45*.25;$('#qBillV').textContent=money(d.bill)+(d.bill>=800?'+':'');$('#qSol').textContent=money(s)+'/mo';$('#qYr').textContent=money((d.bill-s)*12)};r.oninput=up;up();$('#qNext').onclick=()=>this.next()}
+    if(st.type==='bill'){const r=$('#q-bill');const up=()=>{d.bill=+r.value;$('#qBillV').textContent=money(d.bill)+(d.bill>=800?'+':'');};r.oninput=up;up();$('#qNext').onclick=()=>this.next()}
     if(st.type==='contact'){['first','last','email','phone'].forEach(k=>$('#q-'+k).oninput=e=>d[k]=e.target.value.trim());
       $('#qNext').onclick=()=>{const bad=[];const chk=(k,ok,l)=>{$('#q-'+k).setAttribute('aria-invalid',!ok);if(!ok)bad.push(l)};chk('first',!!d.first,'first name');chk('last',!!d.last,'last name');chk('email',/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email||''),'a valid email');chk('phone',(d.phone||'').replace(/\D/g,'').length>=10,'a 10-digit phone');if(bad.length){$('#cMsg').textContent='Please add '+bad.join(', ')+'.';return}this.next()}}
     if(st.type==='consent')$('#qNext').onclick=()=>{if(!$('#q-ok').checked){$('#okMsg').textContent='Check the box so a specialist can contact you.';return}this.finish()};
