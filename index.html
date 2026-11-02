@@ -522,7 +522,7 @@ body.on-quote .mbar{display:none}
               <rect id="pwLed" x="837" y="534" width="5" height="44" rx="2.5" fill="#3ee6a8" opacity="0" filter="url(#gl)"/>
               <circle id="chgLed" cx="1238" cy="553" r="6" fill="#3ee6a8" opacity="0" filter="url(#gl)"/>
             </svg>
-            <div class="chip" id="cPan" style="left:44%;top:36%"><b>Panels</b><span>0 kW</span></div>
+            <div class="chip" id="cPan" style="left:44%;top:36%"><b>10 kW solar</b><span>0 kW</span></div>
             <div class="chip" id="cPw" style="left:61%;top:66%"><b>Powerwall</b><span>50%</span></div>
             <div class="chip" id="cEv" style="left:80%;top:76%"><b>EV</b><span>Parked</span></div>
             <div class="chip" id="cGr" style="left:89%;top:28%"><b>Grid</b><span>0 kW</span></div>
@@ -539,7 +539,7 @@ body.on-quote .mbar{display:none}
             <div class="timeline"><div class="tl-lbl"><b>Drag to change the time of day</b><span id="tlHint">☀️ Daytime</span></div><input type="range" id="tR" min="0" max="23.9" step="0.1" value="12" aria-label="Time of day"><div class="ticks" aria-hidden="true"><span>12 AM</span><span>6 AM</span><span>Noon</span><span>6 PM</span><span>12 AM</span></div></div>
             <div class="presets" id="presets" style="margin-top:12px"><button type="button" data-t="7">Sunrise</button><button type="button" data-t="12">Noon</button><button type="button" data-t="15.5">Afternoon</button><button type="button" data-t="18.8">Sunset</button><button type="button" data-t="21">Night</button><button type="button" data-t="2">2 AM</button></div>
             <div class="legend" style="margin-top:12px"><span><i style="background:#ffc531"></i>Solar power</span><span><i style="background:#3ee6a8"></i>Powerwall power</span><span><i style="background:#9fb3c8"></i>Grid power</span></div>
-            <p class="fine" style="margin:8px 0 0">Illustration of a typical day. Actual production, storage and use depend on your system, home and season.</p>
+            <p class="fine" style="margin:8px 0 0">Example: 10 kW solar system with one 13.5 kWh Tesla Powerwall on a typical sunny day. Actual production, storage and use depend on your system, home and season.</p>
           </div>
         </div>
       </div>
@@ -919,10 +919,11 @@ addEventListener('resize',planMobile);planMobile();
   if(reduce){rep.hidden=false}
 
   // ---- energy model (illustrative) ----
-  const CAP=13.5,MAXR=5,RES=.1;
-  const solar=t=>t>6.3&&t<19.3?7.2*Math.sin(Math.PI*(t-6.3)/13):0;
-  const home=t=>(t>=6&&t<9)?1.4:(t>=17&&t<22.5)?1.6:(t>=22.5||t<6)?0.45:0.9;
-  const ev=t=>(t>=19.5&&t<22.5)?1.8:0;
+  /* example: 10 kW (DC) array, ~8.6 kW peak AC output, one 13.5 kWh Powerwall, no grid reserve */
+  const CAP=13.5,MAXR=5,RES=0,PEAK=8.6;
+  const solar=t=>t>6.3&&t<19.3?PEAK*Math.sin(Math.PI*(t-6.3)/13):0;
+  const home=t=>(t>=6&&t<9)?1.0:(t>=17&&t<22)?1.5:(t>=22||t<6)?0.59:0.9;
+  const ev=t=>(t>=19.5&&t<21.5)?1.8:0;
   const STEP=.05,N=Math.round(24/STEP),SOC=new Float32Array(N+1);
   function flows(t,s){const S=solar(t),H=home(t),E=ev(t);let r={S,H,E,sh:0,se:0,toB:0,toG:0,fromB:0,bh:0,be:0,gh:0,ge:0};
     const load=H+E,used=Math.min(S,load);r.sh=Math.min(S,H);r.se=Math.max(0,used-r.sh);const extra=S-used;
@@ -931,7 +932,7 @@ addEventListener('resize',planMobile);planMobile();
     return r}
   (function(){let s=.35*CAP;for(let p=0;p<3;p++){for(let k=0;k<N;k++){SOC[k]=s;const f=flows(k*STEP,s);s=Math.min(CAP,Math.max(RES*CAP,s+(f.toB-f.fromB)*STEP))}SOC[N]=s}})();
   const socAt=t=>SOC[Math.min(N,Math.max(0,Math.round(t/STEP)))];
-  const evSoc=t=>(t>=7&&t<19.5)?.3:(t>=19.5&&t<22.5)?.3+.6*(t-19.5)/3:.9;
+  const evSoc=t=>(t>=7&&t<19.5)?.3:(t>=19.5&&t<21.5)?.3+.5*(t-19.5)/2:.8;
   const fmt=t=>{let h=Math.floor(t)%24,m=Math.floor((t%1)*60);const ap=h<12?'AM':'PM';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+ap};
 
   // stars
@@ -971,10 +972,12 @@ addEventListener('resize',planMobile);planMobile();
     let msg;
     if(f.S>.2&&f.toB>.05)msg='☀️ Sun is hitting the panels. Solar runs the home and charges the Powerwall.';
     else if(f.S>.2&&f.toG>.05)msg='🔋 Powerwall full. Extra solar goes to the grid for net-metering credit.';
+    else if(f.S>.2&&f.fromB>.05)msg=t<12?'🌅 Sunrise: the Powerwall finishes the night at 0% as the sun takes over.':'🌇 Sunset: the full Powerwall takes over as solar fades.';
     else if(f.S>.2)msg='☀️ Solar is covering what the home uses right now.';
     else if(f.be>.05)msg='🚗 Night: the Powerwall runs the home and charges the car with today’s sunshine.';
     else if(f.fromB>.05&&f.gh>.05)msg='🌙 Powerwall and grid are sharing the load.';
-    else if(f.fromB>.05)msg='🌙 After dark: the Powerwall is running the home on stored solar.';
+    else if(f.fromB>.05&&s/CAP<.08)msg='🌅 Powerwall almost empty, right on time. The sun is coming up to recharge it.';
+    else if(f.fromB>.05)msg='🌙 After dark: the Powerwall runs the whole home on stored solar, all night.';
     else if(f.gh>.05)msg='🔌 Powerwall at its backup reserve. The grid covers the hours before sunrise.';
     else msg='🌙 Quiet hours.';
     $('#status').textContent=msg;
