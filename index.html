@@ -171,11 +171,29 @@ input[type=range]{width:100%;accent-color:var(--charge);height:34px}
 .fine{font-size:.82rem;margin-top:12px}
 .dark .fine{color:var(--mute-d)} .gray .fine,.light .fine{color:var(--mute-l)}
 
-/* ENERGY SCENE */
-.scene-card{margin-top:34px;border-radius:28px;overflow:hidden;background:#0b0f1a;border:1px solid var(--line-d)}
-.scene-svg{display:block;width:100%;height:auto;touch-action:pan-y}
+/* ENERGY SCENE (photo/video) */
+.scene-card{margin-top:34px;border-radius:28px;overflow:hidden;background:#000;border:1px solid var(--line-d)}
+.stage{position:relative;aspect-ratio:1344/768;max-width:100%;background:#000;overflow:hidden}
+.stage video,.explore,.explore img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.explore img{transition:filter .4s}
+.ov{position:absolute;inset:0;width:100%;height:100%}
+.fl{stroke-width:0;opacity:0;stroke-dasharray:1 15;filter:url(#gl)}
+.beam{opacity:0;stroke-width:0}
+.beam.sol{stroke:#ffc531}.beam.bat{stroke:#3ee6a8}.beam.grd{stroke:#9fb3c8}
+.fl.sol{stroke:#ffc531}.fl.bat{stroke:#3ee6a8}.fl.grd{stroke:#9fb3c8}
+.vcap{position:absolute;left:clamp(10px,2.4%,24px);bottom:clamp(10px,3%,24px);display:flex;align-items:center;gap:10px;padding:.55em 1em .55em .55em;border-radius:999px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-weight:600;font-size:clamp(.8rem,1.8vw,1.05rem);transition:opacity .3s}
+.vnum{width:1.8em;height:1.8em;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;font-weight:700}
+.replay{position:absolute;right:clamp(10px,2.4%,24px);bottom:clamp(10px,3%,24px);font:600 .9rem var(--f-body);padding:.6em 1.1em;border-radius:999px;border:0;background:rgba(0,0,0,.72);color:#fff;cursor:pointer}
+.chip{position:absolute;transform:translate(-50%,-100%);display:grid;gap:1px;padding:.4em .75em;border-radius:12px;background:rgba(0,0,0,.74);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;border:1px solid rgba(255,255,255,.18);font-size:clamp(.62rem,1.4vw,.85rem);line-height:1.25;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}
+.chip b{font-weight:600;color:#c9c9c9;font-size:.85em;text-transform:uppercase;letter-spacing:.05em}
+.chip span{font-weight:700}
+.chip.on{border-color:var(--cc,#fff);box-shadow:0 0 14px -2px var(--cc,#fff)}
+@media (max-width:560px){.chip b{display:none}.chip{padding:.3em .55em}}
 .ctrl{display:grid;gap:14px;padding:18px clamp(14px,3vw,24px) 22px;background:#0e0e0e;color:var(--white)}
 .ctrl .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.modes{display:flex;gap:6px;padding:5px;border-radius:999px;background:#1c1c1c;justify-self:start;max-width:100%;flex-wrap:wrap}
+.modes button{font:600 .92rem var(--f-body);padding:.7em 1.2em;border-radius:999px;border:0;background:transparent;color:var(--mute-d);cursor:pointer}
+.modes button[aria-selected="true"]{background:#fff;color:#000}
 .clock{font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums;min-width:6.2ch}
 .status{flex:1 1 240px;font-size:1rem;color:#e8e8e8;min-height:2.6em;display:flex;align-items:center}
 .playbtn{width:48px;height:48px;border-radius:50%;border:2px solid var(--white);background:transparent;color:var(--white);cursor:pointer;display:grid;place-items:center;flex:none}
@@ -183,16 +201,8 @@ input[type=range]{width:100%;accent-color:var(--charge);height:34px}
 .presets{display:flex;gap:8px;flex-wrap:wrap}
 .presets button{font:500 .88rem var(--f-body);padding:.5em 1em;border-radius:999px;border:1px solid var(--line-d);background:transparent;color:var(--white);cursor:pointer}
 .presets button:hover,.presets button.on{background:var(--white);color:var(--black)}
-.meters{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.meters > div{border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.06);min-width:0}
-.meters span{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--mute-d)}
-.meters b{font-size:1.1rem;font-variant-numeric:tabular-nums}
-.meters i{display:block;height:5px;border-radius:9px;background:rgba(255,255,255,.12);margin-top:6px;overflow:hidden}
-.meters i::after{content:"";display:block;height:100%;width:var(--v,0%);background:var(--c,#fff);border-radius:9px;transition:width .3s}
-@media (max-width:720px){.meters{grid-template-columns:repeat(2,1fr)}.meters > div:last-child{grid-column:1/-1}}
 .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--mute-d)}
 .legend i{display:inline-block;width:18px;height:4px;border-radius:4px;vertical-align:middle;margin-right:6px}
-
 /* split rows with their rounded photos */
 .split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,64px);align-items:center}
 .split > *{min-width:0}
@@ -462,90 +472,75 @@ body.on-quote .mbar{display:none}
   <svg class="curve" viewBox="0 0 1440 100" preserveAspectRatio="none" aria-hidden="true" style="background:#000"><defs><linearGradient id="cg1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#1a1a1a"/><stop offset="1" stop-color="#0b0f1a"/></linearGradient></defs><path d="M0 100V40C360 110 720 0 1080 50 1260 75 1360 60 1440 40V100Z" fill="url(#cg1)"/></svg>
   <section class="band" id="how-it-works" style="background:#0b0f1a;color:#fff;padding-top:30px">
     <div class="wrap">
-      <div class="center"><p class="eyebrow">Powering your home with energy from the sun</p><h2 class="h2" style="margin-top:10px">Watch one day on a Power Up home</h2><p class="sub" style="margin-top:12px;color:var(--mute-d)">Press play or drag the time. The sun charges your panels, the panels fill your battery, and the battery runs your home and charges your car after dark.</p></div>
+      <div class="center"><p class="eyebrow">Powering your home with energy from the sun</p><h2 class="h2" style="margin-top:10px">Watch the sun power a Power Up home</h2><p class="sub" style="margin-top:12px;color:var(--mute-d)">Sunlight hits the panels, the panels fill your Powerwall, and the Powerwall runs your home and charges your car after dark.</p></div>
       <div class="scene-card">
-        <svg class="scene-svg" id="scene" viewBox="0 0 900 520" role="img" aria-labelledby="sceneT">
-          <title id="sceneT">Illustration: solar panels charge a home battery by day; the battery powers the home and charges an electric car at night.</title>
-          <defs>
-            <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop id="sky1" offset="0" stop-color="#4a90d9"/><stop id="sky2" offset="1" stop-color="#bfe0ff"/></linearGradient>
-            <radialGradient id="sunG"><stop offset="0" stop-color="#fff7d1"/><stop offset=".45" stop-color="#ffd25a"/><stop offset="1" stop-color="#ffb21e" stop-opacity="0"/></radialGradient>
-            <linearGradient id="pv" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2b4f8a"/><stop offset="1" stop-color="#0f2448"/></linearGradient>
-            <linearGradient id="win" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#ffb84d"/></linearGradient>
-            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
-          </defs>
-          <rect width="900" height="520" fill="url(#sky)"/>
-          <g id="stars" opacity="0"></g>
-          <g id="sunGrp"><circle r="70" fill="url(#sunG)"/><circle r="26" fill="#ffe27a"/></g>
-          <g id="moonGrp" opacity="0"><circle r="20" fill="#f1f1e6"/><circle r="20" cx="9" cy="-6" fill="#1b2340" id="moonCut"/></g>
-          <g id="rays"></g>
-          <!-- hills + ground -->
-          <path d="M0 380 Q160 330 320 370 T640 360 T900 350 V520 H0Z" id="hill" fill="#4f8a4a"/>
-          <rect y="430" width="900" height="90" id="ground" fill="#3e7339"/>
-          <path d="M600 520 L640 430 H860 L900 520Z" id="drive" fill="#9b9b9b"/>
-          <!-- grid pole -->
-          <g id="pole"><rect x="58" y="210" width="8" height="230" fill="#5a4636"/><rect x="34" y="226" width="56" height="6" rx="2" fill="#5a4636"/><circle cx="40" cy="222" r="4" fill="#ccc"/><circle cx="84" cy="222" r="4" fill="#ccc"/><path d="M84 224 Q200 260 268 330" stroke="#222" stroke-width="2" fill="none"/></g>
-          <text x="62" y="460" text-anchor="middle" font-size="14" font-weight="600" fill="#fff" class="slbl">GRID</text>
-          <!-- house -->
-          <g id="house">
-            <rect x="260" y="300" width="300" height="140" fill="#f3f3f0"/>
-            <rect x="260" y="300" width="300" height="10" fill="#d9d9d4"/>
-            <polygon points="240,305 410,190 580,305" fill="#3b3b3b"/>
-            <!-- panels on roof -->
-            <g id="panels"></g>
-            <rect x="290" y="340" width="70" height="56" rx="3" class="w" fill="#5c6b7a"/>
-            <rect x="380" y="340" width="70" height="56" rx="3" class="w" fill="#5c6b7a"/>
-            <rect x="470" y="340" width="60" height="100" rx="3" fill="#6b4b33"/>
-            <circle cx="520" cy="392" r="3" fill="#e6c27a"/>
-            <g id="winGlow" opacity="0"><rect x="290" y="340" width="70" height="56" rx="3" fill="url(#win)"/><rect x="380" y="340" width="70" height="56" rx="3" fill="url(#win)"/></g>
-          </g>
-          <!-- battery on wall -->
-          <g id="batt" transform="translate(568 330)">
-            <rect width="44" height="96" rx="9" fill="#fafafa" stroke="#cfcfcf" stroke-width="2"/>
-            <rect x="8" y="10" width="28" height="76" rx="5" fill="#e3e3e3"/>
-            <rect id="battFill" x="8" y="86" width="28" height="0" rx="5" fill="#22c55e"/>
-            <rect x="20" y="4" width="4" height="3" rx="1" fill="#bbb"/>
-          </g>
-          <g transform="translate(590 318)"><rect x="-34" y="-18" width="68" height="22" rx="11" fill="rgba(0,0,0,.72)"/><text id="battPct" text-anchor="middle" y="-2" font-size="13" font-weight="700" fill="#fff">50%</text></g>
-          <!-- EV + charger -->
-          <g id="charger"><rect x="676" y="378" width="16" height="54" rx="4" fill="#2b2b2b"/><rect x="679" y="384" width="10" height="8" rx="2" id="chgLed" fill="#555"/></g>
-          <g id="car" transform="translate(712 398)">
-            <path d="M0 40 Q2 18 24 14 L50 2 Q62 -2 96 0 L120 14 Q140 18 142 36 L142 44 H0Z" fill="#e8e8e8"/>
-            <path d="M44 14 L56 6 Q64 3 90 4 L106 14Z" fill="#2c3e57"/>
-            <circle cx="30" cy="46" r="13" fill="#1d1d1d"/><circle cx="30" cy="46" r="5" fill="#9a9a9a"/>
-            <circle cx="114" cy="46" r="13" fill="#1d1d1d"/><circle cx="114" cy="46" r="5" fill="#9a9a9a"/>
-            <rect x="60" y="22" width="40" height="7" rx="3.5" fill="#cfcfcf"/>
-            <rect id="carFill" x="60" y="22" width="0" height="7" rx="3.5" fill="#22c55e"/>
-          </g>
-          <path d="M684 404 Q690 440 712 432" stroke="#2b2b2b" stroke-width="4" fill="none" id="cable" opacity=".3"/>
-          <text x="785" y="480" text-anchor="middle" font-size="14" font-weight="600" fill="#fff" class="slbl">EV</text>
-          <!-- flows -->
-          <g fill="none" stroke-linecap="round" stroke-width="5">
-            <path id="fPV_B" d="M455 255 Q560 250 590 330"/>
-            <path id="fPV_H" d="M410 250 Q400 300 410 330"/>
-            <path id="fPV_G" d="M360 250 Q200 200 86 224"/>
-            <path id="fB_H" d="M568 380 Q520 390 470 368"/>
-            <path id="fB_EV" d="M612 410 Q650 420 680 400"/>
-            <path id="fG_H" d="M86 230 Q180 300 262 360"/>
-          </g>
-          <g id="labels" font-size="12" font-weight="700" fill="#fff"></g>
-        </svg>
+        <div class="stage" id="stage">
+          <video id="sceneVid" muted playsinline preload="auto" poster="img/house.jpg" aria-label="Video: sunlight hits rooftop solar panels, power flows to the home and grid, and a Tesla is plugged in to charge"><source src="img/scene.mp4" type="video/mp4"></video>
+          <div class="vcap" id="vcap" aria-live="polite"><span class="vnum">1</span><span id="vcapT">Sunlight hits the panels</span></div>
+          <button class="replay" id="replay" type="button" hidden>↻ Replay</button>
+
+          <div class="explore" id="explore" hidden>
+            <img id="housePic" src="img/house.jpg" alt="Home with all-black rooftop solar panels, a Tesla Powerwall on the garage wall and a white Tesla charging in the driveway">
+            <svg class="ov" viewBox="0 0 1344 768" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <defs>
+                <filter id="gl" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                <linearGradient id="winG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe2a8"/><stop offset=".6" stop-color="#ffb866"/><stop offset="1" stop-color="#d9823a"/></linearGradient>
+                <filter id="soft"><feGaussianBlur stdDeviation="14"/></filter>
+                <radialGradient id="sunR"><stop offset="0" stop-color="#fffbe6"/><stop offset=".25" stop-color="#ffe9a6" stop-opacity=".95"/><stop offset="1" stop-color="#ffc531" stop-opacity="0"/></radialGradient>
+                <linearGradient id="skyT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" id="skyA" stop-color="#0a1230"/><stop offset=".55" id="skyB" stop-color="#20294f"/><stop offset="1" stop-color="#20294f" stop-opacity="0"/></linearGradient>
+                <clipPath id="skyClip"><path d="M0 0H1344V300L1040 318 990 312 880 330 600 342 560 350 120 296 70 300 0 350Z"/></clipPath>
+              </defs>
+              <!-- dusk/night grade -->
+              <rect id="nightAll" width="1344" height="768" fill="#050b1f" opacity="0"/>
+              <rect id="skyTint" width="1344" height="420" fill="url(#skyT)" opacity="0" clip-path="url(#skyClip)"/>
+              <g id="starsO" opacity="0"></g>
+              <g id="moonO" opacity="0"><circle r="18" fill="#f3f1e4"/><circle r="18" cx="8" cy="-5" fill="#121a3a"/></g>
+              <!-- lit windows / lights -->
+              <g id="lights" opacity="0" style="mix-blend-mode:screen">
+                <g fill="url(#winG)" opacity=".78">
+                <rect x="142" y="476" width="52" height="100" rx="2"/>
+                <rect x="312" y="478" width="84" height="98" rx="2"/>
+                <rect x="740" y="476" width="68" height="60" rx="2"/>
+                <rect x="521" y="473" width="18" height="30" rx="2"/></g>
+                <g filter="url(#soft)"><circle cx="168" cy="526" r="60" fill="#ff9d3a" opacity=".55"/><circle cx="354" cy="526" r="70" fill="#ff9d3a" opacity=".55"/><circle cx="774" cy="506" r="50" fill="#ff9d3a" opacity=".5"/><circle cx="849" cy="490" r="34" fill="#ffd28a"/><circle cx="1243" cy="497" r="34" fill="#ffd28a"/></g>
+                <circle cx="849" cy="490" r="5" fill="#fff4d6"/><circle cx="1243" cy="497" r="5" fill="#fff4d6"/>
+              </g>
+              <!-- sun -->
+              <g id="sunO"><circle r="120" fill="url(#sunR)"/><circle r="26" fill="#fffbea"/></g>
+              <!-- flows -->
+              <g fill="none" stroke-linecap="round">
+                <path id="fSun1" class="fl sol"/>
+                <path id="fSun2" class="fl sol"/>
+                <path id="fPB" class="fl sol" d="M800 440 C 830 462 846 480 840 520"/>
+                <path id="fPH" class="fl sol" d="M560 444 C 600 456 628 470 640 498"/>
+                <path id="fPG" class="fl sol" d="M985 322 C 1100 292 1210 262 1344 236"/>
+                <path id="fBH" class="fl bat" d="M818 560 C 780 560 730 546 690 520"/>
+                <path id="fBE" class="fl bat" d="M862 586 C 980 570 1120 548 1234 552"/>
+                <path id="fGH" class="fl grd" d="M1344 236 C 1210 262 1100 292 985 322 C 900 360 760 430 690 500"/>
+              </g>
+              <!-- Powerwall LED -->
+              <rect id="pwLed" x="837" y="534" width="5" height="44" rx="2.5" fill="#3ee6a8" opacity="0" filter="url(#gl)"/>
+              <circle id="chgLed" cx="1238" cy="553" r="6" fill="#3ee6a8" opacity="0" filter="url(#gl)"/>
+            </svg>
+            <div class="chip" id="cPan" style="left:44%;top:36%"><b>Panels</b><span>0 kW</span></div>
+            <div class="chip" id="cPw" style="left:61%;top:66%"><b>Powerwall</b><span>50%</span></div>
+            <div class="chip" id="cEv" style="left:80%;top:76%"><b>EV</b><span>Parked</span></div>
+            <div class="chip" id="cGr" style="left:89%;top:28%"><b>Grid</b><span>0 kW</span></div>
+          </div>
+        </div>
         <div class="ctrl">
-          <div class="top">
-            <button class="playbtn" id="play" type="button" aria-label="Pause"><svg id="playIco" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button>
-            <div class="clock" id="clock" aria-live="off">12:00 PM</div>
-            <div class="status" id="status" aria-live="polite"></div>
+          <div class="modes" role="tablist" aria-label="Scene mode"><button type="button" role="tab" id="mWatch" aria-selected="true">▶ Watch the clip</button><button type="button" role="tab" id="mExplore" aria-selected="false">☀ Explore a full day</button></div>
+          <div id="exCtrl" hidden>
+            <div class="top" style="margin-bottom:12px">
+              <button class="playbtn" id="play" type="button" aria-label="Pause"><svg id="playIco" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button>
+              <div class="clock" id="clock">12:00 PM</div>
+              <div class="status" id="status" aria-live="polite"></div>
+            </div>
+            <div class="timeline"><div class="tl-lbl"><b>Drag to change the time of day</b><span id="tlHint">☀️ Daytime</span></div><input type="range" id="tR" min="0" max="23.9" step="0.1" value="12" aria-label="Time of day"><div class="ticks" aria-hidden="true"><span>12 AM</span><span>6 AM</span><span>Noon</span><span>6 PM</span><span>12 AM</span></div></div>
+            <div class="presets" id="presets" style="margin-top:12px"><button type="button" data-t="7">Sunrise</button><button type="button" data-t="12">Noon</button><button type="button" data-t="15.5">Afternoon</button><button type="button" data-t="18.8">Sunset</button><button type="button" data-t="21">Night</button><button type="button" data-t="2">2 AM</button></div>
+            <div class="legend" style="margin-top:12px"><span><i style="background:#ffc531"></i>Solar power</span><span><i style="background:#3ee6a8"></i>Powerwall power</span><span><i style="background:#9fb3c8"></i>Grid power</span></div>
+            <p class="fine" style="margin:8px 0 0">Illustration of a typical day. Actual production, storage and use depend on your system, home and season.</p>
           </div>
-          <div class="timeline"><div class="tl-lbl"><b>Drag to change the time of day</b><span id="tlHint">☀️ Daytime</span></div><input type="range" id="tR" min="0" max="23.9" step="0.1" value="12" aria-label="Time of day"><div class="ticks" aria-hidden="true"><span>12 AM</span><span>6 AM</span><span>Noon</span><span>6 PM</span><span>12 AM</span></div></div>
-          <div class="presets" id="presets"><button type="button" data-t="7">Sunrise</button><button type="button" data-t="12">Noon</button><button type="button" data-t="15.5">Afternoon</button><button type="button" data-t="18.8">Sunset</button><button type="button" data-t="21">Night</button><button type="button" data-t="2">2 AM</button></div>
-          <div class="meters">
-            <div><span>Solar</span><b id="mSol">0 kW</b><i id="bSol" style="--c:#ffb21e"></i></div>
-            <div><span>Battery</span><b id="mBat">0%</b><i id="bBat" style="--c:#22c55e"></i></div>
-            <div><span>Home use</span><b id="mHome">0 kW</b><i id="bHome" style="--c:#fff"></i></div>
-            <div><span>EV</span><b id="mEv">Idle</b><i id="bEv" style="--c:#38bdf8"></i></div>
-            <div><span>Grid</span><b id="mGrid">0 kW</b><i id="bGrid" style="--c:#a3a3a3"></i></div>
-          </div>
-          <div class="legend"><span><i style="background:#ffb21e"></i>Solar power</span><span><i style="background:#22c55e"></i>Battery power</span><span><i style="background:#a3a3a3"></i>Grid power</span></div>
-          <p class="fine" style="margin:0">Illustration of a typical day. Actual production, storage and use depend on your system, home and season.</p>
         </div>
       </div>
       <div class="center" style="margin-top:28px"><a class="pill" href="#quote">Design my system</a></div>
@@ -907,139 +902,91 @@ $$('[data-ptab]').forEach(b=>b.onclick=()=>{$$('[data-ptab]').forEach(x=>x.setAt
 function planMobile(){const sel=$('[data-ptab][aria-selected="true"]');$$('.plan[data-p]').forEach(p=>p.hidden=innerWidth<=860&&p.dataset.p!==sel.dataset.ptab)}
 addEventListener('resize',planMobile);planMobile();
 
-/* ======================= ENERGY SCENE ======================= */
+/* ======================= ENERGY SCENE (video + photo) ======================= */
 (function(){
-  const NS='http://www.w3.org/2000/svg';
-  // panels on roof slope (right side faces sun path)
-  const pg=$('#panels');let ph='';
-  for(let r=0;r<3;r++)for(let c=0;c<4;c++){const x0=420+c*34-r*0, y0=222+r*24; // approximate slope
-    const px=330+c*36+r*20, py=262-r*24+c*0;}
-  // draw panels on left roof face as parallelograms
-  for(let r=0;r<3;r++){for(let c=0;c<5;c++){
-    const t0=(c)/5,t1=(c+1)/5,v0=r/3+.04,v1=(r+1)/3-.02;
-    // roof left face quad: A(250,300) B(410,198) top ; slope param along ridge->eave
-    const P=(u,v)=>{const ex=250+u*150, ey=300; const rx=410+u*0, ry=198; // simple: map u across, v up
-      const xL=258+ (u)*(300), yL=298; return [xL,yL]};
-  }}
-  // simpler, cleaner: two rows of panels following both roof faces
-  const panels=[];
-  function quad(a,b,c,d){return `${a[0]},${a[1]} ${b[0]},${b[1]} ${c[0]},${c[1]} ${d[0]},${d[1]}`}
-  // left face: line from eave(255,298) to ridge(410,195); right face: ridge(410,195) to eave(565,298)
-  const lerp=(p,q,t)=>[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];
-  [[ [262,293],[404,199] ],[ [416,199],[558,293] ]].forEach(([e,rg])=>{
-    for(let i=0;i<4;i++){ // rows along slope
-      const a=lerp(e,rg,.08+i*.21), b=lerp(e,rg,.08+i*.21+.19);
-      const w=(e[0]<400)? 1: -1;
-      // each row is a strip; split into 2 panels along depth (visual)
-      panels.push(quad([a[0],a[1]],[b[0],b[1]],[b[0],b[1]+10],[a[0],a[1]+10]));
-    }
-  });
-  pg.innerHTML=panels.map((p,i)=>`<polygon class="pv" points="${p}" fill="url(#pv)" stroke="#c6d3e6" stroke-width="1.2"/>`).join('')+
-    `<polygon id="pvShine" points="" fill="#fff" opacity="0"/>`;
-  // stars
-  const st=$('#stars');let sh='';for(let i=0;i<46;i++){sh+=`<circle cx="${(i*197)%900}" cy="${(i*83)%300+6}" r="${(i%3)*0.6+0.7}" fill="#fff" opacity="${.4+(i%5)/8}"/>`}st.innerHTML=sh;
+  const vid=$('#sceneVid'),ex=$('#explore'),exC=$('#exCtrl'),vcap=$('#vcap'),rep=$('#replay');
+  const CAPS=[[0,'1','Sunlight hits the panels'],[1.4,'2','Panels power the home, Powerwall and grid'],[3.5,'3','Your Powerwall charges the car']];
+  let mode='watch',played=false;
+  function setMode(m){mode=m;$('#mWatch').setAttribute('aria-selected',m==='watch');$('#mExplore').setAttribute('aria-selected',m==='explore');
+    ex.hidden=m!=='explore';exC.hidden=m!=='explore';vcap.hidden=m!=='watch';rep.hidden=true;
+    if(m==='watch'){try{vid.currentTime=0;const p=vid.play();p&&p.catch(()=>{rep.hidden=false})}catch(_){}}else{vid.pause();setPlay(!reduce)}}
+  vid.addEventListener('timeupdate',()=>{const t=vid.currentTime;let c=CAPS[0];CAPS.forEach(k=>{if(t>=k[0])c=k});$('.vnum',vcap).textContent=c[1];$('#vcapT').textContent=c[2]});
+  vid.addEventListener('ended',()=>{if(!played){played=true;setMode('explore')}else rep.hidden=false});
+  rep.onclick=()=>setMode('watch');
+  $('#mWatch').onclick=()=>setMode('watch');$('#mExplore').onclick=()=>setMode('explore');
+  // play when visible
+  if('IntersectionObserver'in window){new IntersectionObserver(es=>es.forEach(e=>{if(mode!=='watch')return;if(e.isIntersecting&&!reduce){const p=vid.play();p&&p.catch(()=>{rep.hidden=false})}else vid.pause()}),{threshold:.4}).observe($('#stage'))}
+  if(reduce){rep.hidden=false}
 
   // ---- energy model (illustrative) ----
-  const CAP=13.5, MAXR=5, RES=.1;
+  const CAP=13.5,MAXR=5,RES=.1;
   const solar=t=>t>6.3&&t<19.3?7.2*Math.sin(Math.PI*(t-6.3)/13):0;
   const home=t=>(t>=6&&t<9)?1.4:(t>=17&&t<22.5)?1.6:(t>=22.5||t<6)?0.45:0.9;
   const ev=t=>(t>=19.5&&t<22.5)?1.8:0;
-  const STEP=.05,N=Math.round(24/STEP);const SOC=new Float32Array(N+1);
-  function run(){let s=.35*CAP;for(let pass=0;pass<3;pass++){for(let k=0;k<N;k++){const t=k*STEP;SOC[k]=s;const f=flows(t,s);s=Math.min(CAP,Math.max(RES*CAP,s+(f.toB-f.fromB)*STEP))}SOC[N]=s}}
+  const STEP=.05,N=Math.round(24/STEP),SOC=new Float32Array(N+1);
   function flows(t,s){const S=solar(t),H=home(t),E=ev(t);let r={S,H,E,sh:0,se:0,toB:0,toG:0,fromB:0,bh:0,be:0,gh:0,ge:0};
-    const load=H+E;const used=Math.min(S,load);r.sh=Math.min(S,H);r.se=Math.max(0,used-r.sh);let extra=S-used;
+    const load=H+E,used=Math.min(S,load);r.sh=Math.min(S,H);r.se=Math.max(0,used-r.sh);const extra=S-used;
     if(extra>0){const room=(CAP-s)/STEP;r.toB=Math.min(extra,MAXR,Math.max(0,room));r.toG=extra-r.toB}
-    let need=load-used;if(need>0){const avail=Math.max(0,(s-RES*CAP)/STEP);r.fromB=Math.min(need,MAXR,avail);const hNeed=H-r.sh,eNeed=E-r.se;const tot=hNeed+eNeed||1;r.bh=r.fromB*hNeed/tot;r.be=r.fromB*eNeed/tot;const g=need-r.fromB;r.gh=g*hNeed/tot;r.ge=g*eNeed/tot}
+    const need=load-used;if(need>0){const avail=Math.max(0,(s-RES*CAP)/STEP);r.fromB=Math.min(need,MAXR,avail);const hN=H-r.sh,eN=E-r.se,tot=hN+eN||1;r.bh=r.fromB*hN/tot;r.be=r.fromB*eN/tot;const g=need-r.fromB;r.gh=g*hN/tot;r.ge=g*eN/tot}
     return r}
-  run();
+  (function(){let s=.35*CAP;for(let p=0;p<3;p++){for(let k=0;k<N;k++){SOC[k]=s;const f=flows(k*STEP,s);s=Math.min(CAP,Math.max(RES*CAP,s+(f.toB-f.fromB)*STEP))}SOC[N]=s}})();
   const socAt=t=>SOC[Math.min(N,Math.max(0,Math.round(t/STEP)))];
+  const evSoc=t=>(t>=7&&t<19.5)?.3:(t>=19.5&&t<22.5)?.3+.6*(t-19.5)/3:.9;
+  const fmt=t=>{let h=Math.floor(t)%24,m=Math.floor((t%1)*60);const ap=h<12?'AM':'PM';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+ap};
 
-  // flow path styling
-  const P={pvB:$('#fPV_B'),pvH:$('#fPV_H'),pvG:$('#fPV_G'),bH:$('#fB_H'),bEV:$('#fB_EV'),gH:$('#fG_H')};
-  P.pvB.setAttribute('stroke','#ffb21e');P.pvH.setAttribute('stroke','#ffb21e');P.pvG.setAttribute('stroke','#ffb21e');
-  P.bH.setAttribute('stroke','#22c55e');P.bEV.setAttribute('stroke','#22c55e');P.gH.setAttribute('stroke','#bdbdbd');
-  Object.values(P).forEach(p=>{p.setAttribute('stroke-dasharray','2 12');p._off=0});
-  // labels
-  const LB=[['lPV','PANELS',410,178],['lB','BATTERY',590,448],['lH','HOME',410,462]];
-  $('#labels').innerHTML=LB.map(l=>`<g transform="translate(${l[2]} ${l[3]})"><rect x="-36" y="-14" width="72" height="20" rx="10" fill="rgba(0,0,0,.7)"/><text text-anchor="middle" y="1" font-size="11">${l[1]}</text></g>`).join('');
-
-  // colors
-  const mix=(a,b,t)=>{const p=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16));const A=p(a),B=p(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('')};
-  function skyAt(t){ // day factor 0..1, dusk warmth
-    const d=Math.max(0,Math.min(1,(Math.sin(Math.PI*(t-6)/12.6)+.12)/.6));
-    const dusk=Math.max(0,1-Math.abs(t-18.9)/1.3)+Math.max(0,1-Math.abs(t-6.4)/1.1);
-    let top=mix('#0b1026','#3d84d6',d),bot=mix('#1b2340','#bfe0ff',d);
-    if(dusk>0){top=mix(top,'#5b4b8a',dusk*.6);bot=mix(bot,'#ff9a5a',dusk*.8)}
-    return {d,top,bot,dusk}}
-
-  const el={sun:$('#sunGrp'),moon:$('#moonGrp'),stars:$('#stars'),hill:$('#hill'),ground:$('#ground'),win:$('#winGlow'),fill:$('#battFill'),pct:$('#battPct'),car:$('#carFill'),led:$('#chgLed'),cable:$('#cable'),rays:$('#rays'),moonCut:$('#moonCut')};
-  let T=12,playing=!reduce,last=0;
-  const tR=$('#tR');
-  function fmt(t){let h=Math.floor(t)%24,m=Math.floor((t-Math.floor(t))*60);const ap=h<12?'AM':'PM';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+ap}
-  function evSoc(t){ // car battery visual: charges 19.5-22.5
-    if(t<19.5&&t>=7)return .3; if(t>=19.5&&t<22.5)return .3+.6*(t-19.5)/3; return .9}
+  // stars
+  let sh='';for(let i=0;i<60;i++)sh+=`<circle cx="${(i*211)%1344}" cy="${(i*97)%280+8}" r="${(i%3)*.7+.8}" fill="#fff" opacity="${.35+(i%5)/9}"/>`;$('#starsO').innerHTML=sh;
+  const FL={s1:$('#fSun1'),s2:$('#fSun2'),pb:$('#fPB'),ph:$('#fPH'),pg:$('#fPG'),bh:$('#fBH'),be:$('#fBE'),gh:$('#fGH')};
+  Object.values(FL).forEach(p=>{p._o=0;const b=document.createElementNS('http://www.w3.org/2000/svg','path');b.setAttribute('class','beam '+[...p.classList].filter(c=>c!=='fl').join(' '));b.setAttribute('fill','none');b.setAttribute('stroke-linecap','round');p.parentNode.insertBefore(b,p);p._b=b});
+  const img=$('#housePic'),tR=$('#tR');
+  let T=12,playing=false,last=0;
+  function setPlay(p){playing=p;$('#play').setAttribute('aria-label',p?'Pause':'Play');$('#playIco').innerHTML=p?'<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>':'<path d="M7 4l13 8-13 8z"/>'}
+  function chip(id,txt,on,col){const c=$(id);$('span',c).textContent=txt;c.classList.toggle('on',on);c.style.setProperty('--cc',col)}
   function draw(dt){
-    const t=T,s=socAt(t),f=flows(t,s),sk=skyAt(t);
-    $('#sky1').setAttribute('stop-color',sk.top);$('#sky2').setAttribute('stop-color',sk.bot);
-    el.stars.setAttribute('opacity',(1-sk.d)*.95);
-    el.hill.setAttribute('fill',mix('#13261a','#4f8a4a',sk.d));el.ground.setAttribute('fill',mix('#0f2015','#3e7339',sk.d));
-    el.moonCut.setAttribute('fill',sk.top);
-    // sun arc
-    const up=t>5.8&&t<19.6;const u=(t-5.8)/13.8;
-    const sx=60+u*780,sy=400-Math.sin(Math.PI*u)*330;
-    el.sun.setAttribute('transform',`translate(${sx} ${sy})`);el.sun.setAttribute('opacity',up?1:0);
-    // moon
-    let mt=(t>=19?t-19:t+5)/11;const mx=80+mt*740,my=360-Math.sin(Math.PI*Math.min(1,mt))*260;
-    el.moon.setAttribute('transform',`translate(${mx} ${my})`);el.moon.setAttribute('opacity',(!up&&mt<=1)?Math.min(1,(1-sk.d)*1.4):0);
-    // rays
-    if(f.S>0.2){let rh='';for(let i=0;i<5;i++){const tx=300+i*55,ty=230+(i%2)*14;rh+=`<line x1="${sx}" y1="${sy}" x2="${tx}" y2="${ty}" stroke="#ffd25a" stroke-width="${1.5+f.S/3}" stroke-dasharray="6 10" stroke-dashoffset="${-(performance.now()/30)%16}" opacity="${Math.min(.85,f.S/6)}"/>`}el.rays.innerHTML=rh}else el.rays.innerHTML='';
-    // panels glow
-    $$('.pv').forEach(p=>p.setAttribute('stroke',f.S>0.2?mix('#c6d3e6','#ffe08a',Math.min(1,f.S/7)):'#5d6b80'));
-    // windows
-    el.win.setAttribute('opacity',Math.max(0,1-sk.d*1.6));
-    // battery
-    const pct=s/CAP;const h=76*pct;el.fill.setAttribute('y',86-h+10-10);el.fill.setAttribute('height',h);el.fill.setAttribute('y',10+76-h);
-    el.fill.setAttribute('fill',f.toB>0.05?'#22c55e':f.fromB>0.05?'#4ade80':'#22c55e');
-    el.pct.textContent=Math.round(pct*100)+'%'+(f.toB>0.05?' ⚡':'');
-    // EV
-    const es=evSoc(t);el.car.setAttribute('width',40*es);const charging=f.E>0;el.led.setAttribute('fill',charging?'#22c55e':'#555');el.cable.setAttribute('opacity',charging?1:.25);
-    // flows
-    const set=(p,v,max)=>{const on=v>0.05;p.setAttribute('opacity',on?Math.min(1,.35+v/max):0);p.setAttribute('stroke-width',on?3+Math.min(5,v):0);p._off-=(on?(1+v)*dt*.06:0);p.setAttribute('stroke-dashoffset',p._off)};
-    set(P.pvB,f.toB,4);set(P.pvH,f.sh+f.se,2);set(P.pvG,f.toG,4);set(P.bH,f.bh,2);set(P.bEV,f.be,2);set(P.gH,f.gh+f.ge,2);
-    // HUD
+    const t=T,s=socAt(t),f=flows(t,s);
+    const d=Math.max(0,Math.min(1,(Math.sin(Math.PI*(t-6)/12.6)+.12)/.6));   // daylight 0..1
+    const dusk=Math.max(0,1-Math.abs(t-18.9)/1.3)+Math.max(0,1-Math.abs(t-6.4)/1.1);
+    img.style.filter=`brightness(${(.28+.72*d).toFixed(3)}) saturate(${(.55+.45*d).toFixed(3)}) hue-rotate(${(-12*(1-d)).toFixed(1)}deg)`;
+    $('#nightAll').setAttribute('opacity',(.42*(1-d)).toFixed(3));
+    $('#skyTint').setAttribute('opacity',Math.min(1,(1-d)*1.1).toFixed(3));
+    $('#skyA').setAttribute('stop-color',dusk>.05?'#3a2d63':'#0a1230');$('#skyB').setAttribute('stop-color',dusk>.05?'#ff8a4c':'#1c2550');
+    $('#starsO').setAttribute('opacity',Math.max(0,1-d*1.8).toFixed(3));
+    $('#lights').setAttribute('opacity',Math.max(0,1-d*1.7).toFixed(3));
+    // sun arc across top of frame
+    const up=t>5.8&&t<19.6,u=(t-5.8)/13.8,sx=80+u*1180,sy=300-Math.sin(Math.PI*u)*270;
+    const sun=$('#sunO');sun.setAttribute('transform',`translate(${sx.toFixed(1)} ${sy.toFixed(1)})`);sun.setAttribute('opacity',up?Math.min(1,d*1.6).toFixed(3):0);
+    const mt=(t>=19?t-19:t+5)/11,moon=$('#moonO');moon.setAttribute('transform',`translate(${(120+mt*1100).toFixed(1)} ${(240-Math.sin(Math.PI*Math.min(1,mt))*180).toFixed(1)})`);moon.setAttribute('opacity',(!up&&mt<=1)?Math.min(1,(1-d)*1.4).toFixed(3):0);
+    FL.s1.setAttribute('d',`M${sx} ${sy} Q ${(sx+380)/2} ${Math.min(sy,300)-30} 380 372`);
+    FL.s2.setAttribute('d',`M${sx} ${sy} Q ${(sx+800)/2} ${Math.min(sy,300)-30} 800 372`);
+    const set=(p,v,max,rev)=>{const on=v>.05,k=Math.min(1,v/max);p.style.opacity=on?Math.min(1,.55+k*.45):0;p.style.strokeWidth=on?(4+k*4):0;p._o+=(rev?1:-1)*(on?(1+v)*dt*.05:0);p.style.strokeDashoffset=p._o;const b=p._b;if(p.getAttribute('d'))b.setAttribute('d',p.getAttribute('d'));b.style.opacity=on?(.18+k*.22):0;b.style.strokeWidth=on?(6+k*10):0};
+    set(FL.s1,f.S,5);set(FL.s2,f.S,5);set(FL.pb,f.toB,4);set(FL.ph,f.sh+f.se,2);set(FL.pg,f.toG,4);set(FL.bh,f.bh,2);set(FL.be,f.be,2);set(FL.gh,f.gh+f.ge,2);
+    $('#pwLed').setAttribute('opacity',(f.toB>.05||f.fromB>.05)?1:.25);
+    $('#chgLed').setAttribute('opacity',f.E>0?1:0);
+    const pct=Math.round(s/CAP*100),sm=innerWidth<640,ep=Math.round(evSoc(t)*100),gu=f.gh+f.ge;
+    chip('#cPan',f.S>.05?f.S.toFixed(1)+' kW':(sm?'Off':'Resting'),f.S>.05,'#ffc531');
+    chip('#cPw',pct+'%'+(f.toB>.05?(sm?' ↑':' ↑ charging'):f.fromB>.05?(sm?' ↓':' ↓ powering home'):''),f.toB>.05||f.fromB>.05,'#3ee6a8');
+    chip('#cEv',(f.E>0?'⚡ ':'')+(sm?'':(f.E>0?'Charging · ':'Parked · '))+ep+'%',f.E>0,'#3ee6a8');
+    chip('#cGr',f.toG>.05?(sm?'→ ':'Sending ')+f.toG.toFixed(1)+' kW':(gu>.05?(sm?'← ':'Using ')+gu.toFixed(1)+' kW':'Idle'),f.toG>.05||gu>.05,'#9fb3c8');
     $('#clock').textContent=fmt(t);
     let msg;
-    if(f.S>0.2&&f.toB>0.05)msg='☀️ The sun is hitting the panels. Solar is powering the home and charging the battery.';
-    else if(f.S>0.2&&f.toG>0.05)msg='🔋 Battery full. Extra solar flows to the grid for net-metering credits.';
-    else if(f.S>0.2)msg='☀️ Solar is covering what the home is using right now.';
-    else if(f.be>0.05)msg='🚗 Night: the battery is powering the home and charging the EV in the driveway.';
-    else if(f.fromB>0.05)msg='🌙 After dark: the battery stored today’s sunshine and is running the home.';
-    else if(f.gh>0.05)msg='🔌 Battery at its backup reserve. The grid covers the last hours until sunrise.';
-    else msg='🌙 Quiet hours. The home is resting.';
-    if(f.fromB>0.05&&f.gh>0.05)msg='🌙 Battery and grid are sharing the load.';
+    if(f.S>.2&&f.toB>.05)msg='☀️ Sun is hitting the panels. Solar runs the home and charges the Powerwall.';
+    else if(f.S>.2&&f.toG>.05)msg='🔋 Powerwall full. Extra solar goes to the grid for net-metering credit.';
+    else if(f.S>.2)msg='☀️ Solar is covering what the home uses right now.';
+    else if(f.be>.05)msg='🚗 Night: the Powerwall runs the home and charges the car with today’s sunshine.';
+    else if(f.fromB>.05&&f.gh>.05)msg='🌙 Powerwall and grid are sharing the load.';
+    else if(f.fromB>.05)msg='🌙 After dark: the Powerwall is running the home on stored solar.';
+    else if(f.gh>.05)msg='🔌 Powerwall at its backup reserve. The grid covers the hours before sunrise.';
+    else msg='🌙 Quiet hours.';
     $('#status').textContent=msg;
-    const m=(id,v,txt,pc)=>{$(id).textContent=txt;$(id.replace('m','b')).style.setProperty('--v',pc+'%')};
-    m('#mSol',0,f.S.toFixed(1)+' kW',f.S/7.2*100);
-    m('#mBat',0,Math.round(pct*100)+'%'+(f.toB>0.05?' ↑':f.fromB>0.05?' ↓':''),pct*100);
-    m('#mHome',0,f.H.toFixed(1)+' kW',f.H/2*100);
-    m('#mEv',0,charging?'Charging':'Parked',es*100);
-    const g=f.toG>0.05?('Selling '+f.toG.toFixed(1)+' kW'):(f.gh+f.ge>0.05?('Using '+(f.gh+f.ge).toFixed(1)+' kW'):'0 kW');
-    m('#mGrid',0,g,Math.min(100,(f.toG+f.gh+f.ge)/5*100));
-    if(document.activeElement!==tR)tR.value=t.toFixed(1);tR.classList.toggle('night',f.S<=0.2);$('#tlHint').textContent=f.S>0.2?'☀️ Daytime':'🌙 Night';
+    if(document.activeElement!==tR)tR.value=t.toFixed(1);
+    tR.classList.toggle('night',f.S<=.2);$('#tlHint').textContent=f.S>.2?'☀️ Daytime':'🌙 Night';
     $$('#presets button').forEach(b=>b.classList.toggle('on',Math.abs(+b.dataset.t-t)<.3));
   }
-  function loop(now){const dt=Math.min(64,now-(last||now));last=now;if(playing&&$('#scene').getBoundingClientRect().bottom>0){T=(T+dt/1000*0.8)%24}if($('#scene').offsetParent)draw(dt);requestAnimationFrame(loop)}
-  function setPlay(p){playing=p;$('#play').setAttribute('aria-label',p?'Pause':'Play');$('#playIco').innerHTML=p?'<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>':'<path d="M7 4l13 8-13 8z"/>'}
+  function loop(now){const dt=Math.min(64,now-(last||now));last=now;if(mode==='explore'&&!ex.hidden){if(playing)T=(T+dt/1000*.8)%24;draw(dt)}requestAnimationFrame(loop)}
   $('#play').onclick=()=>setPlay(!playing);
   tR.addEventListener('input',()=>{T=+tR.value;setPlay(false)});
   $$('#presets button').forEach(b=>b.onclick=()=>{T=+b.dataset.t;setPlay(false)});
-  // drag sun
-  const svg=$('#scene');let drag=false;
-  svg.addEventListener('pointerdown',e=>{const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(svg.getScreenCTM().inverse());if(q.y<330){drag=true;setPlay(false);svg.setPointerCapture(e.pointerId);mv(q)}});
-  function mv(q){const u=Math.max(0,Math.min(1,(q.x-60)/780));T=5.8+u*13.8}
-  svg.addEventListener('pointermove',e=>{if(!drag)return;const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;mv(p.matrixTransform(svg.getScreenCTM().inverse()))});
-  svg.addEventListener('pointerup',()=>drag=false);
-  setPlay(playing);draw(0);requestAnimationFrame(loop);
+  draw(0);requestAnimationFrame(loop);
 })();
 
 /* ======================= QUOTE FUNNEL ======================= */
