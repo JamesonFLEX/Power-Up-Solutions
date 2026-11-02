@@ -866,6 +866,8 @@ body.on-quote .mbar{display:none}
 <script>
 (function(){
 const LEAD_SMS='+19168244650'; /* where funnel leads are texted — change to +19163501417 to route to the dealer line */
+/* Quote funnel leads are emailed via FormSubmit (formsubmit.co). The first submission sends an activation email to this inbox — click it once. */
+const LEAD_EMAIL_ENDPOINT='https://formsubmit.co/ajax/tmcmanuspowerup@gmail.com';
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1033,9 +1035,20 @@ const Q=window.Q={data:{bill:250},i:0,started:false,
     if(st.type==='consent')$('#qNext').onclick=()=>{if(!$('#q-ok').checked){$('#okMsg').textContent='Check the box so a specialist can contact you.';return}this.finish()};
   },
   finish(){const d=this.data;$$('#qBar i').forEach(b=>b.classList.add('on'));$('#qCount').textContent='Complete';$('#qLeft').textContent='';
-    const body=['Solar quote request — Power Up Solutions'].concat(this.rows().map(r=>r[0]+': '+(r[1]||'—'))).join('\n');
-    $('#qStage').innerHTML=`<div class="q-step go"><div class="done-ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div><h2 tabindex="-1">You’re all set, ${esc(d.first)}!</h2><p class="hint">Send your answers to our team by text and a Power Up specialist will build your custom quote.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="pill solid" href="sms:${LEAD_SMS}?&body=${encodeURIComponent(body)}">Text my quote request</a><button class="pill" type="button" data-copy="${esc(body)}">Copy my answers</button></div><div class="phones"><div><b>(916) 824-4650</b><span class="hint">Main line</span><button class="copy" type="button" data-copy="(916) 824-4650">Copy</button></div><div><b>(916) 350-1417</b><span class="hint">Rocklin office</span><button class="copy" type="button" data-copy="(916) 350-1417">Copy</button></div></div></div>`;
-    $('#qStage h2').focus({preventScroll:true})}
+    const rows=this.rows();
+    const body=['Solar quote request — Power Up Solutions'].concat(rows.map(r=>r[0]+': '+(r[1]||'—'))).join('\n');
+    const ck='<div class="done-ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>';
+    const phones=`<div class="phones"><div><b>(916) 824-4650</b><span class="hint">Main line</span><button class="copy" type="button" data-copy="(916) 824-4650">Copy</button></div><div><b>(916) 350-1417</b><span class="hint">Rocklin office</span><button class="copy" type="button" data-copy="(916) 350-1417">Copy</button></div></div>`;
+    $('#qStage').innerHTML=`<div class="q-step go"><h2 tabindex="-1">Sending your quote request…</h2><p class="hint">One moment.</p></div>`;
+    const payload={_subject:'New solar quote: '+(d.first||'')+' '+(d.last||'')+' · '+(d.zip||''),_template:'table',_captcha:'false',_replyto:d.email||''};
+    rows.forEach(r=>payload[r[0]]=r[1]||'—');payload['Submitted']=new Date().toLocaleString('en-US',{timeZone:'America/Los_Angeles'})+' PT';payload['Page']=location.href.split('#')[0];
+    const ok=()=>{$('#qStage').innerHTML=`<div class="q-step go">${ck}<h2 tabindex="-1">You’re all set, ${esc(d.first)}!</h2><p class="hint">Your quote request was sent to the Power Up team. A specialist will reach out at <b style="color:var(--ink)">${esc(d.phone)}</b> to build your custom quote.</p><p class="hint">Want to talk now? Call us:</p>${phones}</div>`;$('#qStage h2').focus({preventScroll:true})};
+    const fail=()=>{$('#qStage').innerHTML=`<div class="q-step go">${ck}<h2 tabindex="-1">Almost there, ${esc(d.first)}</h2><p class="hint">We couldn’t send your request automatically. Tap below to text it to our team, or give us a call.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="pill solid" href="sms:${LEAD_SMS}?&body=${encodeURIComponent(body)}">Text my quote request</a><button class="pill" type="button" data-copy="${esc(body)}">Copy my answers</button></div>${phones}</div>`;$('#qStage h2').focus({preventScroll:true})};
+    const ctl=('AbortController'in window)?new AbortController():null;const tm=setTimeout(()=>ctl&&ctl.abort(),12000);
+    fetch(LEAD_EMAIL_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload),signal:ctl&&ctl.signal})
+      .then(r=>r.json().catch(()=>({})).then(j=>{clearTimeout(tm);(r.ok&&String(j.success)!=='false')?ok():fail()}))
+      .catch(()=>{clearTimeout(tm);fail()});
+  }
 };
 $$('[data-start]').forEach(b=>b.onclick=()=>{$$('[data-start]').forEach(x=>x.setAttribute('aria-pressed',x===b));Q.data.own=b.dataset.start;setTimeout(()=>{location.hash='quote'},220)});
 $$('[data-plan]').forEach(b=>b.addEventListener('click',()=>Q.data.plan=b.dataset.plan));
