@@ -15,5 +15,5 @@ Find-and-replace `https://jamesonflex.github.io/Power-Up-Solutions/` in `index.h
 
 ## Lead routing
 - Quote funnel: each completed request is emailed to tmcmanuspowerup@gmail.com through FormSubmit (`LEAD_EMAIL_ENDPOINT` near the top of the script in `index.html`). The very first submission triggers a one-time activation email to that inbox; click "Activate Form" or no leads are delivered.
-- If the email can't be sent, the visitor gets a text-message and call fallback to (916) 824-4650 (`LEAD_SMS`).
+- If the email can't be sent, the visitor gets a text-message and call fallback to the Rocklin office, (916) 350-1417 (`LEAD_SMS`).
 - Careers, Dealer and Referral forms still use the text-message handoff.

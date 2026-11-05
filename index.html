@@ -350,6 +350,8 @@ input[type=range]{width:100%;accent-color:var(--charge);height:34px}
 .phones div{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .copy{font:500 .8rem var(--f-body);padding:.35em .9em;border-radius:999px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer}
 
+.q-card .pill.solid,.formcard .pill.solid{background:#000;color:#fff;border-color:#000}
+.q-card .pill:not(.solid),.formcard .pill:not(.solid){color:#000;border-color:#000}
 /* inner page forms */
 .formcard{background:var(--white);color:var(--ink);border-radius:36px;padding:clamp(22px,5vw,40px);max-width:760px;margin:30px auto 0}
 .formcard form{display:grid;gap:14px}
@@ -844,7 +846,7 @@ body.on-quote .mbar{display:none}
 
 <script>
 (function(){
-const LEAD_SMS='+19168244650'; /* where funnel leads are texted — change to +19163501417 to route to the dealer line */
+const LEAD_SMS='+19163501417'; /* fallback text goes to the Rocklin office */
 /* Quote funnel leads are emailed via FormSubmit (formsubmit.co). The first submission sends an activation email to this inbox — click it once. */
 const LEAD_EMAIL_ENDPOINT='https://formsubmit.co/ajax/tmcmanuspowerup@gmail.com';
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1017,10 +1019,10 @@ const Q=window.Q={data:{bill:250},i:0,started:false,
     const payload={_subject:'New solar quote: '+(d.first||'')+' '+(d.last||'')+' · '+(d.zip||''),_template:'table',_captcha:'false',_replyto:d.email||''};
     rows.forEach(r=>payload[r[0]]=r[1]||'—');payload['Submitted']=new Date().toLocaleString('en-US',{timeZone:'America/Los_Angeles'})+' PT';payload['Page']=location.href.split('#')[0];
     const ok=()=>{$('#qStage').innerHTML=`<div class="q-step go">${ck}<h2 tabindex="-1">You’re all set, ${esc(d.first)}!</h2><p class="hint">Your quote request was sent to the Power Up team. A specialist will reach out at <b style="color:var(--ink)">${esc(d.phone)}</b> to build your custom quote.</p><p class="hint">Want to talk now? Call us:</p>${phones}</div>`;$('#qStage h2').focus({preventScroll:true})};
-    const fail=()=>{$('#qStage').innerHTML=`<div class="q-step go">${ck}<h2 tabindex="-1">Almost there, ${esc(d.first)}</h2><p class="hint">We couldn’t send your request automatically. Tap below to text it to our team, or give us a call.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="pill solid" href="sms:${LEAD_SMS}?&body=${encodeURIComponent(body)}">Text my quote request</a><button class="pill" type="button" data-copy="${esc(body)}">Copy my answers</button></div>${phones}</div>`;$('#qStage h2').focus({preventScroll:true})};
+    const fail=()=>{$('#qStage').innerHTML=`<div class="q-step go">${ck}<h2 tabindex="-1">Almost there, ${esc(d.first)}</h2><p class="hint">We couldn’t send your request automatically. Tap below to text it to our Rocklin office, or give us a call.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="pill solid" href="sms:${LEAD_SMS}?&body=${encodeURIComponent(body)}">Text my quote request</a><button class="pill" type="button" data-copy="${esc(body)}">Copy my answers</button></div>${phones}</div>`;$('#qStage h2').focus({preventScroll:true})};
     const ctl=('AbortController'in window)?new AbortController():null;const tm=setTimeout(()=>ctl&&ctl.abort(),12000);
     fetch(LEAD_EMAIL_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload),signal:ctl&&ctl.signal})
-      .then(r=>r.json().catch(()=>({})).then(j=>{clearTimeout(tm);(r.ok&&String(j.success)!=='false')?ok():fail()}))
+      .then(r=>r.json().catch(()=>({})).then(j=>{clearTimeout(tm);if(r.ok&&String(j.success)!=='false')ok();else{try{console.warn('Lead email not delivered:',j&&j.message)}catch(_){}fail()}}))
       .catch(()=>{clearTimeout(tm);fail()});
   }
 };
@@ -1033,7 +1035,7 @@ $$('form[data-form]').forEach(f=>f.addEventListener('submit',e=>{e.preventDefaul
   $$('[required]',f).forEach(i=>{let ok=i.type==='checkbox'?i.checked:i.value.trim()!=='';if(i.type==='email')ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(i.value);if(i.type==='tel')ok=i.value.replace(/\D/g,'').length>=10;i.setAttribute('aria-invalid',!ok);if(!ok&&!bad)bad=i});
   if(bad){bad.focus();return}
   const body=[f.dataset.form+' — Power Up Solutions'].concat($$('input:not([type=checkbox]),select,textarea',f).filter(i=>i.value.trim()).map(i=>i.name+': '+i.value.trim())).join('\n');
-  f.parentElement.innerHTML=`<div class="q-step go"><div class="done-ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div><h2>Ready to send</h2><p class="hint">Text this to Power Up Solutions at (916) 824-4650 so the team can follow up.</p><div class="sumry" style="white-space:pre-wrap">${esc(body)}</div><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="pill solid" href="sms:${LEAD_SMS}?&body=${encodeURIComponent(body)}">Text it now</a><button class="pill" type="button" data-copy="${esc(body)}">Copy</button></div></div>`}));
+  f.parentElement.innerHTML=`<div class="q-step go"><div class="done-ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div><h2>Ready to send</h2><p class="hint">Text this to our Rocklin office at (916) 350-1417 so the team can follow up.</p><div class="sumry" style="white-space:pre-wrap">${esc(body)}</div><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="pill solid" href="sms:${LEAD_SMS}?&body=${encodeURIComponent(body)}">Text it now</a><button class="pill" type="button" data-copy="${esc(body)}">Copy</button></div></div>`}));
 
 /* copy */
 document.addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(!b)return;const t=b.dataset.copy;const ok=()=>{const o=b.textContent;b.textContent='Copied';setTimeout(()=>b.textContent=o,1400)};try{navigator.clipboard.writeText(t).then(ok,()=>{})}catch(_){}});
