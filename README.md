@@ -14,6 +14,6 @@ Static one-page site (no build step). GitHub Pages serves `main` from the repo r
 Find-and-replace `https://jamesonflex.github.io/Power-Up-Solutions/` in `index.html`, `robots.txt` and `sitemap.xml` with the new domain, then add a `CNAME` file.
 
 ## Lead routing
-- Quote funnel: each completed request is emailed to tmcmanuspowerup@gmail.com through FormSubmit (`LEAD_EMAIL_ENDPOINT` near the top of the script in `index.html`). The very first submission triggers a one-time activation email to that inbox; click "Activate Form" or no leads are delivered.
+- Quote funnel: each completed request is emailed through EmailJS (service_vg0buu1 / template_4okl5ze, sent from Jameson's Gmail to tmcmanuspowerup@gmail.com, Bcc solarjameson@gmail.com). Settings live in the `EMAILJS` constant near the top of the script in `index.html`. Free plan: 200 emails/month.
 - If the email can't be sent, the visitor gets a text-message and call fallback to the Rocklin office, (916) 350-1417 (`LEAD_SMS`).
 - Careers, Dealer and Referral forms still use the text-message handoff.

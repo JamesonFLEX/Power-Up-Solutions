@@ -847,8 +847,8 @@ body.on-quote .mbar{display:none}
 <script>
 (function(){
 const LEAD_SMS='+19163501417'; /* fallback text goes to the Rocklin office */
-/* Quote funnel leads are emailed via FormSubmit (formsubmit.co). The first submission sends an activation email to this inbox — click it once. */
-const LEAD_EMAIL_ENDPOINT='https://formsubmit.co/ajax/tmcmanuspowerup@gmail.com';
+/* Quote funnel leads are emailed through EmailJS (template sends to tmcmanuspowerup@gmail.com, Bcc solarjameson@gmail.com). */
+const EMAILJS={service:'service_vg0buu1',template:'template_4okl5ze',key:'RtQdoRLNc3WYtjzon'};
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1016,13 +1016,13 @@ const Q=window.Q={data:{bill:250},i:0,started:false,
     const ck='<div class="done-ic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></div>';
     const phones=`<div class="phones"><div><b>(916) 824-4650</b><span class="hint">Main line</span><button class="copy" type="button" data-copy="(916) 824-4650">Copy</button></div><div><b>(916) 350-1417</b><span class="hint">Rocklin office</span><button class="copy" type="button" data-copy="(916) 350-1417">Copy</button></div></div>`;
     $('#qStage').innerHTML=`<div class="q-step go"><h2 tabindex="-1">Sending your quote request…</h2><p class="hint">One moment.</p></div>`;
-    const payload={_subject:'New solar quote: '+(d.first||'')+' '+(d.last||'')+' · '+(d.zip||''),_template:'table',_captcha:'false',_replyto:d.email||''};
-    rows.forEach(r=>payload[r[0]]=r[1]||'—');payload['Submitted']=new Date().toLocaleString('en-US',{timeZone:'America/Los_Angeles'})+' PT';payload['Page']=location.href.split('#')[0];
+    const msg=rows.map(r=>r[0]+': '+(r[1]||'—')).join('\n')+'\n\nSubmitted: '+new Date().toLocaleString('en-US',{timeZone:'America/Los_Angeles'})+' PT\nPage: '+location.href.split('#')[0];
+    const params={name:((d.first||'')+' '+(d.last||'')).trim(),email:d.email||'',phone:d.phone||'',zip:d.zip||'',title:'Solar quote request',time:new Date().toLocaleString('en-US',{timeZone:'America/Los_Angeles',dateStyle:'medium',timeStyle:'short'})+' PT',message:msg,details:msg};
     const ok=()=>{$('#qStage').innerHTML=`<div class="q-step go">${ck}<h2 tabindex="-1">You’re all set, ${esc(d.first)}!</h2><p class="hint">Your quote request was sent to the Power Up team. A specialist will reach out at <b style="color:var(--ink)">${esc(d.phone)}</b> to build your custom quote.</p><p class="hint">Want to talk now? Call us:</p>${phones}</div>`;$('#qStage h2').focus({preventScroll:true})};
     const fail=()=>{$('#qStage').innerHTML=`<div class="q-step go">${ck}<h2 tabindex="-1">Almost there, ${esc(d.first)}</h2><p class="hint">We couldn’t send your request automatically. Tap below to text it to our Rocklin office, or give us a call.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="pill solid" href="sms:${LEAD_SMS}?&body=${encodeURIComponent(body)}">Text my quote request</a><button class="pill" type="button" data-copy="${esc(body)}">Copy my answers</button></div>${phones}</div>`;$('#qStage h2').focus({preventScroll:true})};
     const ctl=('AbortController'in window)?new AbortController():null;const tm=setTimeout(()=>ctl&&ctl.abort(),12000);
-    fetch(LEAD_EMAIL_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload),signal:ctl&&ctl.signal})
-      .then(r=>r.json().catch(()=>({})).then(j=>{clearTimeout(tm);if(r.ok&&String(j.success)!=='false')ok();else{try{console.warn('Lead email not delivered:',j&&j.message)}catch(_){}fail()}}))
+    fetch('https://api.emailjs.com/api/v1.0/email/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service_id:EMAILJS.service,template_id:EMAILJS.template,user_id:EMAILJS.key,template_params:params}),signal:ctl&&ctl.signal})
+      .then(r=>r.text().then(t=>{clearTimeout(tm);if(r.ok)ok();else{try{console.warn('Lead email not delivered:',r.status,t)}catch(_){}fail()}}))
       .catch(()=>{clearTimeout(tm);fail()});
   }
 };
